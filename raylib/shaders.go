@@ -87,9 +87,18 @@ func GetShaderLocation(shader Shader, uniformName string) int32 {
 func SetShaderValue(shader Shader, uniformLoc int32, value []float32, size int32) {
 	cshader := shader.cptr()
 	cuniformLoc := (C.int)(uniformLoc)
-	cvalue := unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&value)).Data)
+	cvalue := (*C.float)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&value)).Data))
 	csize := (C.int)(size)
 	C.SetShaderValue(*cshader, cuniformLoc, cvalue, csize)
+}
+
+// SetShaderValuei - Set shader uniform value (int)
+func SetShaderValuei(shader Shader, uniformLoc int32, value []int32, size int32) {
+	cshader := shader.cptr()
+	cuniformLoc := (C.int)(uniformLoc)
+	cvalue := (*C.int)(unsafe.Pointer((*reflect.SliceHeader)(unsafe.Pointer(&value)).Data))
+	csize := (C.int)(size)
+	C.SetShaderValuei(*cshader, cuniformLoc, cvalue, csize)
 }
 
 // SetShaderValueMatrix - Set shader uniform value (matrix 4x4)
@@ -146,11 +155,12 @@ func GenTexturePrefilter(shader Shader, cubemap Texture2D, size int) Texture2D {
 }
 
 // GenTextureBRDF - Generate BRDF texture using cubemap data
-func GenTextureBRDF(shader Shader, size int) Texture2D {
+func GenTextureBRDF(shader Shader, cubemap Texture2D, size int) Texture2D {
 	cshader := shader.cptr()
+	ccubemap := cubemap.cptr()
 	csize := (C.int)(size)
 
-	ret := C.GenTextureBRDF(*cshader, csize)
+	ret := C.GenTextureBRDF(*cshader, *ccubemap, csize)
 	v := newTexture2DFromPointer(unsafe.Pointer(&ret))
 	return v
 }
@@ -177,9 +187,18 @@ func EndBlendMode() {
 	C.EndBlendMode()
 }
 
+// GetVrDeviceInfo - Get VR device information for some standard devices
+func GetVrDeviceInfo(vrDevice VrDevice) VrDeviceInfo {
+	cvrDevice := (C.int)(vrDevice)
+	ret := C.GetVrDeviceInfo(cvrDevice)
+	v := newVrDeviceInfoFromPointer(unsafe.Pointer(&ret))
+	return v
+}
+
 // InitVrSimulator - Init VR simulator for selected device
-func InitVrSimulator() {
-	C.InitVrSimulator()
+func InitVrSimulator(vrDeviceInfo VrDeviceInfo) {
+	cvrDeviceInfo := vrDeviceInfo.cptr()
+	C.InitVrSimulator(*cvrDeviceInfo)
 }
 
 // CloseVrSimulator - Close VR simulator for current device

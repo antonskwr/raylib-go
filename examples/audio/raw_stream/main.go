@@ -39,7 +39,7 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 		// Refill audio stream if required
-		if rl.IsAudioStreamProcessed(stream) {
+		if rl.IsAudioBufferProcessed(stream) {
 			numSamples := int32(0)
 			if samplesLeft >= maxSamplesPerUpdate {
 				numSamples = maxSamplesPerUpdate

@@ -8,6 +8,8 @@
 
 Golang bindings for [raylib](http://www.raylib.com/), a simple and easy-to-use library to learn videogames programming.
 
+![screenshot](https://goo.gl/q6DAoy)
+
 ### Requirements
 
 ##### Ubuntu

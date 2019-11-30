@@ -162,12 +162,11 @@ func DrawGizmo(position Vector3) {
 	C.DrawGizmo(*cposition)
 }
 
-// LoadMeshes - Load mesh from file
-func LoadMeshes(fileName string) Mesh {
+// LoadMesh - Load mesh from file
+func LoadMesh(fileName string) Mesh {
 	cfileName := C.CString(fileName)
 	defer C.free(unsafe.Pointer(cfileName))
-	ccount := C.int(0)
-	ret := C.LoadMeshes(cfileName, &ccount)
+	ret := C.LoadMesh(cfileName)
 	v := newMeshFromPointer(unsafe.Pointer(&ret))
 	return v
 }
@@ -198,7 +197,7 @@ func UnloadModel(model Model) {
 // UnloadMesh - Unload mesh from memory (RAM and/or VRAM)
 func UnloadMesh(mesh *Mesh) {
 	cmesh := mesh.cptr()
-	C.UnloadMesh(*cmesh)
+	C.UnloadMesh(cmesh)
 }
 
 // ExportMesh - Export mesh as an OBJ file
@@ -309,12 +308,11 @@ func GenMeshCubicmap(cubicmap Image, size Vector3) Mesh {
 	return v
 }
 
-// LoadMaterials - Load material data (.MTL)
-func LoadMaterials(fileName string) Material {
+// LoadMaterial - Load material data (.MTL)
+func LoadMaterial(fileName string) Material {
 	cfileName := C.CString(fileName)
 	defer C.free(unsafe.Pointer(cfileName))
-	ccount := C.int(0)
-	ret := C.LoadMaterials(cfileName, &ccount)
+	ret := C.LoadMaterial(cfileName)
 	v := newMaterialFromPointer(unsafe.Pointer(&ret))
 	return v
 }
