@@ -144,10 +144,6 @@
     #include "external/rgif.h"  // Support GIF recording
 #endif
 
-#if defined(__APPLE__)
-    #define SUPPORT_HIGH_DPI    // Force HighDPI support on macOS
-#endif
-
 #include <stdio.h>          // Standard input / output lib
 #include <stdlib.h>         // Required for: malloc(), free(), rand(), atexit()
 #include <stdint.h>         // Required for: typedef unsigned long long int uint64_t, used by hi-res timer
@@ -318,6 +314,7 @@ static int renderOffsetY = 0;                   // Offset Y from render area (mu
 static bool fullscreen = false;                 // Fullscreen mode (useful only for PLATFORM_DESKTOP)
 static bool alwaysRun = false;                  // Keep window update/draw running on minimized
 static Matrix screenScaling = { 0 };            // Matrix to scale screen (framebuffer rendering)
+static Vector2 contentScaling = { 0 };
 
 #if defined(PLATFORM_RPI)
 static EGL_DISPMANX_WINDOW_T nativeWindow;      // Native window (graphic device)
@@ -3145,16 +3142,16 @@ static bool InitGraphicsDevice(int width, int height)
     int fbWidth = renderWidth;
     int fbHeight = renderHeight;
 
-#if defined(PLATFORM_DESKTOP) && defined(SUPPORT_HIGH_DPI)
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+#if defined(PLATFORM_DESKTOP)
+    glfwGetMonitorContentScale(monitor, &contentScaling.x, &contentScaling.y);
+    TraceLog(LOG_WARNING, "monitor scale %f", contentScaling.x);
 
-    // Screen scaling matrix is required in case desired screen area is different than display area
-    screenScaling = MatrixScale((float)fbWidth/screenWidth, (float)fbHeight/screenHeight, 1.0f);
-#if !defined(__APPLE__)
-    SetMouseScale((float)screenWidth/fbWidth, (float)screenHeight/fbHeight);
-#endif
-    SetTextureFilter(GetFontDefault().texture, FILTER_BILINEAR);
-#endif  // PLATFORM_DESKTOP && SUPPORT_HIGH_DPI
+    if ((contentScaling.x == 2.0f) && (contentScaling.y == 2.0f))
+    {
+        TraceLog(LOG_WARNING, "TRUEEEEE", contentScaling.x);
+        SetTextureFilter(GetFontDefault().texture, FILTER_BILINEAR);
+    }
+#endif  // PLATFORM_DESKTOP
 
     // Setup default viewport
     SetupViewport(fbWidth, fbHeight);
@@ -3179,7 +3176,8 @@ static void SetupViewport(int width, int height)
     // Set viewport width and height
     // NOTE: We consider render size and offset in case black bars are required and
     // render area does not match full display area (this situation is only applicable on fullscreen mode)
-    rlViewport(renderOffsetX/2, renderOffsetY/2, renderWidth - renderOffsetX, renderHeight - renderOffsetY);
+    // rlViewport(renderOffsetX/2, renderOffsetY/2, renderWidth - renderOffsetX, renderHeight - renderOffsetY);
+    rlViewport(renderOffsetX/2, renderOffsetY/2, (renderWidth * (int)contentScaling.x) - renderOffsetX, (renderHeight * (int)contentScaling.y) - renderOffsetY);
 
     rlMatrixMode(RL_PROJECTION);        // Switch to PROJECTION matrix
     rlLoadIdentity();                   // Reset current matrix (PROJECTION)
@@ -3970,8 +3968,7 @@ static void CursorEnterCallback(GLFWwindow *window, int enter)
 // NOTE: Window resizing not allowed by default
 static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 {
-    SetupViewport(width, height);    // Reset viewport and projection matrix for new size
-
+    SetupViewport(width, height);    // Reset viewport and projection matrix for new size 
     // Set current screen size
     screenWidth = width;
     screenHeight = height;
