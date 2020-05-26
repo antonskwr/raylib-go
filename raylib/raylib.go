@@ -293,6 +293,30 @@ const (
 
 	// Gamepad Buttons/Axis
 
+	// General Controller Buttons
+	GamepadButtonUnknown = 0
+	GamepadLeftFaceUP    = 1
+	GamepadLeftFaceRIGHT = 2
+	GamepadLeftFaceDOWN  = 3
+	GamepadLeftFaceLEFT  = 4
+
+	GamepadRightFaceUP    = 5
+	GamepadRightFaceRIGHT = 6
+	GamepadRightFaceDOWN  = 7
+	GamepadRightFaceLEFT  = 8
+
+	GamepadButtonL1 = 9
+	GamepadButtonL2 = 11
+	GamepadButtonR1 = 10
+	GamepadButtonR2 = 12
+
+	GamepadAxisLeftX        = 1
+	GamepadAxisLeftY        = 2
+	GamepadAxisRightX       = 3
+	GamepadAxisRightY       = 4
+	GamepadAxisLeftTrigger  = 5
+	GamepadAxisRightTrigger = 6
+
 	// PS3 USB Controller Buttons
 	GamepadPs3ButtonTriangle = 0
 	GamepadPs3ButtonCircle   = 1

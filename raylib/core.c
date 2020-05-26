@@ -2300,11 +2300,84 @@ const char *GetGamepadName(int gamepad)
 // Return gamepad axis count
 int GetGamepadAxisCount(int gamepad)
 {
-#if defined(PLATFORM_RPI)
-    int axisCount = 0;
-    if (gamepadReady[gamepad]) ioctl(gamepadStream[gamepad], JSIOCGAXES, &axisCount);
-    gamepadAxisCount = axisCount;
-#endif
+    // int buttonsCount = 0;
+    // const unsigned char *buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonsCount);
+
+    // for (int i = 0; i < buttonsCount; i++)
+    // {
+    //     printf("b[%i]:%i ", i, (buttons[i] == GLFW_PRESS));
+    // }
+
+    // printf("\t");
+
+    // printf("\n");
+
+    // GLFWgamepadstate state;
+ 
+    // if (glfwGetGamepadState(GLFW_JOYSTICK_1, &state))
+    // {
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_A])
+    //     {
+    //         printf("A\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_B])
+    //     {
+    //         printf("B\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_Y])
+    //     {
+    //         printf("Y\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_X])
+    //     {
+    //         printf("X\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER])
+    //     {
+    //         printf("LEFT_BUMPER\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER])
+    //     {
+    //         printf("RIGHT_BUMPER\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_BACK])
+    //     {
+    //         printf("BACK\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_START])
+    //     {
+    //         printf("START\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_GUIDE])
+    //     {
+    //         printf("GUIDE\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_THUMB])
+    //     {
+    //         printf("LEFT_THUMB\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB])
+    //     {
+    //         printf("RIGHT_THUMB\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP])
+    //     {
+    //         printf("DPAD_UP\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT])
+    //     {
+    //         printf("DPAD_RIGHT\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN])
+    //     {
+    //         printf("DPAD_DOWN\n");
+    //     }
+    //     if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT])
+    //     {
+    //         printf("DPAD_LEFT\n");
+    //     }
+    // }
+
     return gamepadAxisCount;
 }
 
@@ -2313,9 +2386,10 @@ float GetGamepadAxisMovement(int gamepad, int axis)
 {
     float value = 0;
 
-#if !defined(PLATFORM_ANDROID)
-    if ((gamepad < MAX_GAMEPADS) && gamepadReady[gamepad] && (axis < MAX_GAMEPAD_AXIS)) value = gamepadAxisState[gamepad][axis];
-#endif
+    if ((gamepad < MAX_GAMEPADS) && gamepadReady[gamepad] && (axis < MAX_GAMEPAD_AXIS))
+    {
+        value = gamepadAxisState[gamepad][axis];
+    }
 
     return value;
 }
@@ -2339,10 +2413,11 @@ bool IsGamepadButtonDown(int gamepad, int button)
 {
     bool result = false;
 
-#if !defined(PLATFORM_ANDROID)
     if ((gamepad < MAX_GAMEPADS) && gamepadReady[gamepad] && (button < MAX_GAMEPAD_BUTTONS) &&
-        (currentGamepadState[gamepad][button] == 1)) result = true;
-#endif
+        (currentGamepadState[gamepad][button] == 1))
+    {
+        result = true;
+    }
 
     return result;
 }
@@ -3352,52 +3427,30 @@ static int GetGamepadButton(int button)
 #if defined(PLATFORM_DESKTOP)
     switch (button)
     {
-        case GLFW_GAMEPAD_BUTTON_Y: btn = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
-        case GLFW_GAMEPAD_BUTTON_B: btn = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
-        case GLFW_GAMEPAD_BUTTON_A: btn = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
-        case GLFW_GAMEPAD_BUTTON_X: btn = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
-
-        case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER: btn = GAMEPAD_BUTTON_LEFT_TRIGGER_1; break;
-        case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER: btn = GAMEPAD_BUTTON_RIGHT_TRIGGER_1; break;
-
-        case GLFW_GAMEPAD_BUTTON_BACK: btn = GAMEPAD_BUTTON_MIDDLE_LEFT; break;
-        case GLFW_GAMEPAD_BUTTON_GUIDE: btn = GAMEPAD_BUTTON_MIDDLE; break;
-        case GLFW_GAMEPAD_BUTTON_START: btn = GAMEPAD_BUTTON_MIDDLE_RIGHT; break;
-
-        case GLFW_GAMEPAD_BUTTON_DPAD_UP: btn = GAMEPAD_BUTTON_LEFT_FACE_UP; break;
-        case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT: btn = GAMEPAD_BUTTON_LEFT_FACE_RIGHT; break;
-        case GLFW_GAMEPAD_BUTTON_DPAD_DOWN: btn = GAMEPAD_BUTTON_LEFT_FACE_DOWN; break;
-        case GLFW_GAMEPAD_BUTTON_DPAD_LEFT: btn = GAMEPAD_BUTTON_LEFT_FACE_LEFT; break;
-
-        case GLFW_GAMEPAD_BUTTON_LEFT_THUMB: btn = GAMEPAD_BUTTON_LEFT_THUMB; break;
-        case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB: btn = GAMEPAD_BUTTON_RIGHT_THUMB; break;
-    }
-#endif
-
-#if defined(PLATFORM_UWP)
-    btn = button;   // UWP will provide the correct button
-#endif
-
-#if defined(PLATFORM_WEB)
-    // Gamepad Buttons reference: https://www.w3.org/TR/gamepad/#gamepad-interface
-    switch (button)
-    {
-        case 0: btn = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
-        case 1: btn = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
-        case 2: btn = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
         case 3: btn = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
-        case 4: btn = GAMEPAD_BUTTON_LEFT_TRIGGER_1; break;
-        case 5: btn = GAMEPAD_BUTTON_RIGHT_TRIGGER_1; break;
-        case 6: btn = GAMEPAD_BUTTON_LEFT_TRIGGER_2; break;
-        case 7: btn = GAMEPAD_BUTTON_RIGHT_TRIGGER_2; break;
-        case 8: btn = GAMEPAD_BUTTON_MIDDLE_LEFT; break;
-        case 9: btn = GAMEPAD_BUTTON_MIDDLE_RIGHT; break;
-        case 10: btn = GAMEPAD_BUTTON_LEFT_THUMB; break;
-        case 11: btn = GAMEPAD_BUTTON_RIGHT_THUMB; break;
-        case 12: btn = GAMEPAD_BUTTON_LEFT_FACE_UP; break;
-        case 13: btn = GAMEPAD_BUTTON_LEFT_FACE_DOWN; break;
-        case 14: btn = GAMEPAD_BUTTON_LEFT_FACE_LEFT; break;
-        case 15: btn = GAMEPAD_BUTTON_LEFT_FACE_RIGHT; break;
+        case 2: btn = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
+        case 1: btn = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
+        case 0: btn = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
+
+        // case GLFW_GAMEPAD_BUTTON_Y: btn = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
+        // case GLFW_GAMEPAD_BUTTON_B: btn = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
+        // case GLFW_GAMEPAD_BUTTON_A: btn = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
+        // case GLFW_GAMEPAD_BUTTON_X: btn = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
+
+        // case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER: btn = GAMEPAD_BUTTON_LEFT_TRIGGER_1; break;
+        // case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER: btn = GAMEPAD_BUTTON_RIGHT_TRIGGER_1; break;
+
+        // case GLFW_GAMEPAD_BUTTON_BACK: btn = GAMEPAD_BUTTON_MIDDLE_LEFT; break;
+        // case GLFW_GAMEPAD_BUTTON_GUIDE: btn = GAMEPAD_BUTTON_MIDDLE; break;
+        // case GLFW_GAMEPAD_BUTTON_START: btn = GAMEPAD_BUTTON_MIDDLE_RIGHT; break;
+
+        // case GLFW_GAMEPAD_BUTTON_DPAD_UP: btn = GAMEPAD_BUTTON_LEFT_FACE_UP; break;
+        // case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT: btn = GAMEPAD_BUTTON_LEFT_FACE_RIGHT; break;
+        // case GLFW_GAMEPAD_BUTTON_DPAD_DOWN: btn = GAMEPAD_BUTTON_LEFT_FACE_DOWN; break;
+        // case GLFW_GAMEPAD_BUTTON_DPAD_LEFT: btn = GAMEPAD_BUTTON_LEFT_FACE_LEFT; break;
+
+        // case GLFW_GAMEPAD_BUTTON_LEFT_THUMB: btn = GAMEPAD_BUTTON_LEFT_THUMB; break;
+        // case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB: btn = GAMEPAD_BUTTON_RIGHT_THUMB; break;
     }
 #endif
 
@@ -3420,21 +3473,6 @@ static int GetGamepadAxis(int axis)
     }
 #endif
 
-#if defined(PLATFORM_UWP)
-    axs = axis;     // UWP will provide the correct axis
-#endif
-
-#if defined(PLATFORM_WEB)
-    // Gamepad axis reference:https://www.w3.org/TR/gamepad/#gamepad-interface
-    switch (axis)
-    {
-        case 0: axs = GAMEPAD_AXIS_LEFT_X;
-        case 1: axs = GAMEPAD_AXIS_LEFT_Y;
-        case 2: axs = GAMEPAD_AXIS_RIGHT_X;
-        case 3: axs = GAMEPAD_AXIS_RIGHT_X;
-    }
-#endif
-
     return axs;
 }
 
@@ -3450,188 +3488,6 @@ static void PollInputEvents(void)
     // Reset key pressed registered
     keyPressedQueueCount = 0;
 
-#if !defined(PLATFORM_RPI)
-    // Reset last gamepad button/axis registered state
-    lastGamepadButtonPressed = -1;
-    gamepadAxisCount = 0;
-#endif
-
-#if defined(PLATFORM_RPI)
-    // Register previous keys states
-    for (int i = 0; i < 512; i++)previousKeyState[i] = currentKeyState[i];
-
-    // Grab a keypress from the evdev fifo if avalable
-    if (lastKeyPressedEvdev.Head != lastKeyPressedEvdev.Tail)
-    {
-        keyPressedQueue[keyPressedQueueCount] = lastKeyPressedEvdev.Contents[lastKeyPressedEvdev.Tail];    // Read the key from the buffer
-        keyPressedQueueCount++;
-        
-        lastKeyPressedEvdev.Tail = (lastKeyPressedEvdev.Tail + 1) & 0x07;           // Increment the tail pointer forwards and binary wraparound after 7 (fifo is 8 elements long)
-    }
-
-    // Register previous mouse states
-    previousMouseWheelY = currentMouseWheelY;
-    currentMouseWheelY = 0;
-    for (int i = 0; i < 3; i++)
-    {
-        previousMouseState[i] = currentMouseState[i];
-        currentMouseState[i] = currentMouseStateEvdev[i];
-    }
-#endif
-
-#if defined(PLATFORM_UWP)
-    // Register previous keys states
-    for (int i = 0; i < 512; i++) previousKeyState[i] = currentKeyState[i];
-
-    for (int i = 0; i < MAX_GAMEPADS; i++)
-    {
-        if (gamepadReady[i])
-        {
-            for (int k = 0; k < MAX_GAMEPAD_BUTTONS; k++) previousGamepadState[i][k] = currentGamepadState[i][k];
-        }
-    }
-
-    // Register previous mouse states
-    previousMouseWheelY = currentMouseWheelY;
-    currentMouseWheelY = 0;
-    for (int i = 0; i < 3; i++) previousMouseState[i] = currentMouseState[i];
-
-    // Loop over pending messages
-    while (HasMessageFromUWP())
-    {
-        UWPMessage *msg = GetMessageFromUWP();
-
-        switch (msg->type)
-        {
-            case UWP_MSG_REGISTER_KEY:
-            {
-                // Convert from virtualKey
-                int actualKey = -1;
-
-                switch (msg->paramInt0)
-                {
-                    case 0x08: actualKey = KEY_BACKSPACE; break;
-                    case 0x20: actualKey = KEY_SPACE; break;
-                    case 0x1B: actualKey = KEY_ESCAPE; break;
-                    case 0x0D: actualKey = KEY_ENTER; break;
-                    case 0x2E: actualKey = KEY_DELETE; break;
-                    case 0x27: actualKey = KEY_RIGHT; break;
-                    case 0x25: actualKey = KEY_LEFT; break;
-                    case 0x28: actualKey = KEY_DOWN; break;
-                    case 0x26: actualKey = KEY_UP; break;
-                    case 0x70: actualKey = KEY_F1; break;
-                    case 0x71: actualKey = KEY_F2; break;
-                    case 0x72: actualKey = KEY_F3; break;
-                    case 0x73: actualKey = KEY_F4; break;
-                    case 0x74: actualKey = KEY_F5; break;
-                    case 0x75: actualKey = KEY_F6; break;
-                    case 0x76: actualKey = KEY_F7; break;
-                    case 0x77: actualKey = KEY_F8; break;
-                    case 0x78: actualKey = KEY_F9; break;
-                    case 0x79: actualKey = KEY_F10; break;
-                    case 0x7A: actualKey = KEY_F11; break;
-                    case 0x7B: actualKey = KEY_F12; break;
-                    case 0xA0: actualKey = KEY_LEFT_SHIFT; break;
-                    case 0xA2: actualKey = KEY_LEFT_CONTROL; break;
-                    case 0xA4: actualKey = KEY_LEFT_ALT; break;
-                    case 0xA1: actualKey = KEY_RIGHT_SHIFT; break;
-                    case 0xA3: actualKey = KEY_RIGHT_CONTROL; break;
-                    case 0xA5: actualKey = KEY_RIGHT_ALT; break;
-                    case 0x30: actualKey = KEY_ZERO; break;
-                    case 0x31: actualKey = KEY_ONE; break;
-                    case 0x32: actualKey = KEY_TWO; break;
-                    case 0x33: actualKey = KEY_THREE; break;
-                    case 0x34: actualKey = KEY_FOUR; break;
-                    case 0x35: actualKey = KEY_FIVE; break;
-                    case 0x36: actualKey = KEY_SIX; break;
-                    case 0x37: actualKey = KEY_SEVEN; break;
-                    case 0x38: actualKey = KEY_EIGHT; break;
-                    case 0x39: actualKey = KEY_NINE; break;
-                    case 0x41: actualKey = KEY_A; break;
-                    case 0x42: actualKey = KEY_B; break;
-                    case 0x43: actualKey = KEY_C; break;
-                    case 0x44: actualKey = KEY_D; break;
-                    case 0x45: actualKey = KEY_E; break;
-                    case 0x46: actualKey = KEY_F; break;
-                    case 0x47: actualKey = KEY_G; break;
-                    case 0x48: actualKey = KEY_H; break;
-                    case 0x49: actualKey = KEY_I; break;
-                    case 0x4A: actualKey = KEY_J; break;
-                    case 0x4B: actualKey = KEY_K; break;
-                    case 0x4C: actualKey = KEY_L; break;
-                    case 0x4D: actualKey = KEY_M; break;
-                    case 0x4E: actualKey = KEY_N; break;
-                    case 0x4F: actualKey = KEY_O; break;
-                    case 0x50: actualKey = KEY_P; break;
-                    case 0x51: actualKey = KEY_Q; break;
-                    case 0x52: actualKey = KEY_R; break;
-                    case 0x53: actualKey = KEY_S; break;
-                    case 0x54: actualKey = KEY_T; break;
-                    case 0x55: actualKey = KEY_U; break;
-                    case 0x56: actualKey = KEY_V; break;
-                    case 0x57: actualKey = KEY_W; break;
-                    case 0x58: actualKey = KEY_X; break;
-                    case 0x59: actualKey = KEY_Y; break;
-                    case 0x5A: actualKey = KEY_Z; break;
-                    default: break;
-                }
-
-                if (actualKey > -1) currentKeyState[actualKey] = msg->paramChar0;
-
-            } break;
-            case UWP_MSG_REGISTER_CLICK: currentMouseState[msg->paramInt0] = msg->paramChar0; break;
-            case UWP_MSG_SCROLL_WHEEL_UPDATE: currentMouseWheelY += msg->paramInt0; break;
-            case UWP_MSG_UPDATE_MOUSE_LOCATION: mousePosition = msg->paramVector0; break;
-            case UWP_MSG_SET_GAMEPAD_ACTIVE: if (msg->paramInt0 < MAX_GAMEPADS) gamepadReady[msg->paramInt0] = msg->paramBool0; break;
-            case UWP_MSG_SET_GAMEPAD_BUTTON:
-            {
-                if ((msg->paramInt0 < MAX_GAMEPADS) && (msg->paramInt1 < MAX_GAMEPAD_BUTTONS)) currentGamepadState[msg->paramInt0][msg->paramInt1] = msg->paramChar0;
-            } break;
-            case UWP_MSG_SET_GAMEPAD_AXIS:
-            {
-                if ((msg->paramInt0 < MAX_GAMEPADS) && (msg->paramInt1 < MAX_GAMEPAD_AXIS)) gamepadAxisState[msg->paramInt0][msg->paramInt1] = msg->paramFloat0;
-
-                // Register buttons for 2nd triggers
-                currentGamepadState[msg->paramInt0][GAMEPAD_BUTTON_LEFT_TRIGGER_2] = (char)(gamepadAxisState[msg->paramInt0][GAMEPAD_AXIS_LEFT_TRIGGER] > 0.1);
-                currentGamepadState[msg->paramInt0][GAMEPAD_BUTTON_RIGHT_TRIGGER_2] = (char)(gamepadAxisState[msg->paramInt0][GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.1);
-            } break;
-            case UWP_MSG_SET_DISPLAY_DIMS:
-            {
-                displayWidth = msg->paramVector0.x;
-                displayHeight = msg->paramVector0.y;
-            } break;
-            case UWP_MSG_HANDLE_RESIZE:
-            {
-                eglQuerySurface(display, surface, EGL_WIDTH, &screenWidth);
-                eglQuerySurface(display, surface, EGL_HEIGHT, &screenHeight);
-
-                // If window is resized, viewport and projection matrix needs to be re-calculated
-                rlViewport(0, 0, screenWidth, screenHeight);            // Set viewport width and height
-                rlMatrixMode(RL_PROJECTION);                // Switch to PROJECTION matrix
-                rlLoadIdentity();                           // Reset current matrix (PROJECTION)
-                rlOrtho(0, screenWidth, screenHeight, 0, 0.0f, 1.0f);   // Orthographic projection mode with top-left corner at (0,0)
-                rlMatrixMode(RL_MODELVIEW);                 // Switch back to MODELVIEW matrix
-                rlLoadIdentity();                           // Reset current matrix (MODELVIEW)
-                rlClearScreenBuffers();                     // Clear screen buffers (color and depth)
-
-                // Window size must be updated to be used on 3D mode to get new aspect ratio (BeginMode3D())
-                // NOTE: Be careful! GLFW3 will choose the closest fullscreen resolution supported by current monitor,
-                // for example, if reescaling back to 800x450 (desired), it could set 720x480 (closest fullscreen supported)
-                currentWidth = screenWidth;
-                currentHeight = screenHeight;
-
-                // NOTE: Postprocessing texture is not scaled to new size
-
-                windowResized = true;
-
-            } break;
-            case UWP_MSG_SET_GAME_TIME: currentTime = msg->paramDouble0; break;
-            default: break;
-        }
-
-        DeleteUWPMessage(msg); //Delete, we are done
-    }
-#endif  // PLATFORM_UWP
 
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
     // Mouse input polling
@@ -3670,17 +3526,25 @@ static void PollInputEvents(void)
         if (gamepadReady[i])     // Check if gamepad is available
         {
             // Register previous gamepad states
-            for (int k = 0; k < MAX_GAMEPAD_BUTTONS; k++) previousGamepadState[i][k] = currentGamepadState[i][k];
+            for (int k = 0; k < MAX_GAMEPAD_BUTTONS; k++)
+            {
+                previousGamepadState[i][k] = currentGamepadState[i][k];
+            }
 
             // Get current gamepad state
             // NOTE: There is no callback available, so we get it manually
             // Get remapped buttons
-            GLFWgamepadstate state;
-            glfwGetGamepadState(i, &state); // This remapps all gamepads so they have their buttons mapped like an xbox controller
-            const unsigned char *buttons = state.buttons;
+            // GLFWgamepadstate state;
+            // glfwGetGamepadState(i, &state); // This remapps all gamepads so they have their buttons mapped like an xbox controller
+            // const unsigned char *buttons = state.buttons;
 
-            for (int k = 0; (buttons != NULL) && (k < GLFW_GAMEPAD_BUTTON_DPAD_LEFT + 1) && (k < MAX_GAMEPAD_BUTTONS); k++)
+            int buttonsCount = 0;
+            const unsigned char *buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonsCount);
+
+            for (int k = 0; (buttons != NULL) && (k < MAX_GAMEPAD_BUTTONS) && (k < buttonsCount); k++)
             {
+                printf("b[%i]:%i ", k, (buttons[k] == GLFW_PRESS));
+
                 const GamepadButton button = GetGamepadButton(k);
 
                 if (buttons[k] == GLFW_PRESS)
@@ -3691,20 +3555,49 @@ static void PollInputEvents(void)
                 else currentGamepadState[i][button] = 0;
             }
 
-            // Get current axis state
-            const float *axes = state.axes;
+            printf("\t");
 
-            for (int k = 0; (axes != NULL) && (k < GLFW_GAMEPAD_AXIS_LAST + 1) && (k < MAX_GAMEPAD_AXIS); k++)
+            // for (int k = 0; (buttons != NULL) && (k < GLFW_GAMEPAD_BUTTON_DPAD_LEFT + 1) && (k < MAX_GAMEPAD_BUTTONS); k++)
+            // {
+            //     const GamepadButton button = GetGamepadButton(k);
+
+            //     if (buttons[k] == GLFW_PRESS)
+            //     {
+            //         currentGamepadState[i][button] = 1;
+            //         lastGamepadButtonPressed = button;
+            //     }
+            //     else currentGamepadState[i][button] = 0;
+            // }
+            
+
+            // Get current axis state
+            int axesCount = 0;
+            const float *axes = glfwGetJoystickAxes(i, &axesCount);
+
+            for (int k = 0; (axes != NULL) && (k < MAX_GAMEPAD_AXIS) && (k < axesCount); k++)
             {
-                const int axis = GetGamepadAxis(k);
+                printf("ax[%i]:%.3f ", k, axes[k]);
+                printf("\t");
+                const GamepadAxis axis = GetGamepadAxis(k);
                 gamepadAxisState[i][axis] = axes[k];
             }
+
+            printf("\n");
+
+            // const float *axes = state.axes;
+
+            // for (int k = 0; (axes != NULL) && (k < GLFW_GAMEPAD_AXIS_LAST + 1) && (k < MAX_GAMEPAD_AXIS); k++)
+            // {
+            //     const GamepadAxis axis = GetGamepadAxis(k);
+            //     gamepadAxisState[i][axis] = axes[k];
+            // }
 
             // Register buttons for 2nd triggers (because GLFW doesn't count these as buttons but rather axis)
             currentGamepadState[i][GAMEPAD_BUTTON_LEFT_TRIGGER_2] = (char)(gamepadAxisState[i][GAMEPAD_AXIS_LEFT_TRIGGER] > 0.1);
             currentGamepadState[i][GAMEPAD_BUTTON_RIGHT_TRIGGER_2] = (char)(gamepadAxisState[i][GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.1);
 
-            gamepadAxisCount = GLFW_GAMEPAD_AXIS_LAST;
+            // gamepadAxisCount = GLFW_GAMEPAD_AXIS_LAST;
+            gamepadAxisCount = axesCount;
         }
     }
 
@@ -3716,81 +3609,6 @@ static void PollInputEvents(void)
     glfwPollEvents();       // Register keyboard/mouse events (callbacks)... and window events!
 #endif
 #endif      //defined(PLATFORM_DESKTOP)
-
-// Gamepad support using emscripten API
-// NOTE: GLFW3 joystick functionality not available in web
-#if defined(PLATFORM_WEB)
-    // Get number of gamepads connected
-    int numGamepads = 0;
-    if (emscripten_sample_gamepad_data() == EMSCRIPTEN_RESULT_SUCCESS) numGamepads = emscripten_get_num_gamepads();
-
-    for (int i = 0; (i < numGamepads) && (i < MAX_GAMEPADS); i++)
-    {
-        // Register previous gamepad button states
-        for (int k = 0; k < MAX_GAMEPAD_BUTTONS; k++) previousGamepadState[i][k] = currentGamepadState[i][k];
-
-        EmscriptenGamepadEvent gamepadState;
-
-        int result = emscripten_get_gamepad_status(i, &gamepadState);
-
-        if (result == EMSCRIPTEN_RESULT_SUCCESS)
-        {
-            // Register buttons data for every connected gamepad
-            for (int j = 0; (j < gamepadState.numButtons) && (j < MAX_GAMEPAD_BUTTONS); j++)
-            {
-                const GamepadButton button = GetGamepadButton(j);
-                if (gamepadState.digitalButton[j] == 1)
-                {
-                    currentGamepadState[i][button] = 1;
-                    lastGamepadButtonPressed = button;
-                }
-                else currentGamepadState[i][button] = 0;
-
-                //TraceLog(LOG_DEBUG, "Gamepad %d, button %d: Digital: %d, Analog: %g", gamepadState.index, j, gamepadState.digitalButton[j], gamepadState.analogButton[j]);
-            }
-
-            // Register axis data for every connected gamepad
-            for (int j = 0; (j < gamepadState.numAxes) && (j < MAX_GAMEPAD_AXIS); j++)
-            {
-                const int axis = GetGamepadAxis(j);
-                gamepadAxisState[i][axis] = gamepadState.axis[j];
-            }
-
-            gamepadAxisCount = gamepadState.numAxes;
-        }
-    }
-#endif
-
-#if defined(PLATFORM_ANDROID)
-    // Register previous keys states
-    // NOTE: Android supports up to 260 keys
-    for (int i = 0; i < 260; i++) previousKeyState[i] = currentKeyState[i];
-
-    // Poll Events (registered events)
-    // NOTE: Activity is paused if not enabled (appEnabled)
-    while ((ident = ALooper_pollAll(appEnabled? 0 : -1, NULL, &events,(void**)&source)) >= 0)
-    {
-        // Process this event
-        if (source != NULL) source->process(androidApp, source);
-
-        // NOTE: Never close window, native activity is controlled by the system!
-        if (androidApp->destroyRequested != 0)
-        {
-            //TraceLog(LOG_INFO, "Closing Window...");
-            //windowShouldClose = true;
-            //ANativeActivity_finish(androidApp->activity);
-        }
-    }
-#endif
-
-#if defined(PLATFORM_RPI) && defined(SUPPORT_SSH_KEYBOARD_RPI)
-    // NOTE: Keyboard reading could be done using input_event(s) reading or just read from stdin,
-    // we now use both methods inside here. 2nd method is still used for legacy purposes (Allows for input trough SSH console)
-    ProcessKeyboard();
-
-    // NOTE: Mouse input events polling is done asynchronously in another pthread - EventThread()
-    // NOTE: Gamepad (Joystick) input events polling is done asynchonously in another pthread - GamepadThread()
-#endif
 }
 
 // Copy back buffer to front buffers
