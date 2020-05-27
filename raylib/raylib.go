@@ -310,6 +310,13 @@ const (
 	GamepadButtonR1 = 10
 	GamepadButtonR2 = 12
 
+	GamepadMiddleLeft  = 13
+	GamepadMiddle      = 14
+	GamepadMiddleRight = 15
+
+	GamepadLeftThumb  = 16
+	GamepadRightThumb = 17
+
 	GamepadAxisLeftX        = 1
 	GamepadAxisLeftY        = 2
 	GamepadAxisRightX       = 3

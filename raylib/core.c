@@ -2288,10 +2288,6 @@ const char *GetGamepadName(int gamepad)
 #if defined(PLATFORM_DESKTOP)
     if (gamepadReady[gamepad]) return glfwGetJoystickName(gamepad);
     else return NULL;
-#elif defined(PLATFORM_RPI)
-    if (gamepadReady[gamepad]) ioctl(gamepadStream[gamepad], JSIOCGNAME(64), &gamepadName);
-
-    return gamepadName;
 #else
     return NULL;
 #endif
@@ -2441,10 +2437,11 @@ bool IsGamepadButtonUp(int gamepad, int button)
 {
     bool result = false;
 
-#if !defined(PLATFORM_ANDROID)
     if ((gamepad < MAX_GAMEPADS) && gamepadReady[gamepad] && (button < MAX_GAMEPAD_BUTTONS) &&
-        (currentGamepadState[gamepad][button] == 0)) result = true;
-#endif
+        (currentGamepadState[gamepad][button] == 0))
+    {
+        result = true;
+    }
 
     return result;
 }
@@ -3427,30 +3424,25 @@ static int GetGamepadButton(int button)
 #if defined(PLATFORM_DESKTOP)
     switch (button)
     {
-        case 3: btn = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
-        case 2: btn = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
-        case 1: btn = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
-        case 0: btn = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
+        case GLFW_GAMEPAD_BUTTON_Y: btn = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
+        case GLFW_GAMEPAD_BUTTON_B: btn = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
+        case GLFW_GAMEPAD_BUTTON_A: btn = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
+        case GLFW_GAMEPAD_BUTTON_X: btn = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
 
-        // case GLFW_GAMEPAD_BUTTON_Y: btn = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
-        // case GLFW_GAMEPAD_BUTTON_B: btn = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
-        // case GLFW_GAMEPAD_BUTTON_A: btn = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
-        // case GLFW_GAMEPAD_BUTTON_X: btn = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
+        case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER: btn = GAMEPAD_BUTTON_LEFT_TRIGGER_1; break;
+        case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER: btn = GAMEPAD_BUTTON_RIGHT_TRIGGER_1; break;
 
-        // case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER: btn = GAMEPAD_BUTTON_LEFT_TRIGGER_1; break;
-        // case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER: btn = GAMEPAD_BUTTON_RIGHT_TRIGGER_1; break;
+        case GLFW_GAMEPAD_BUTTON_BACK: btn = GAMEPAD_BUTTON_MIDDLE_LEFT; break;
+        case GLFW_GAMEPAD_BUTTON_GUIDE: btn = GAMEPAD_BUTTON_MIDDLE; break;
+        case GLFW_GAMEPAD_BUTTON_START: btn = GAMEPAD_BUTTON_MIDDLE_RIGHT; break;
 
-        // case GLFW_GAMEPAD_BUTTON_BACK: btn = GAMEPAD_BUTTON_MIDDLE_LEFT; break;
-        // case GLFW_GAMEPAD_BUTTON_GUIDE: btn = GAMEPAD_BUTTON_MIDDLE; break;
-        // case GLFW_GAMEPAD_BUTTON_START: btn = GAMEPAD_BUTTON_MIDDLE_RIGHT; break;
+        case GLFW_GAMEPAD_BUTTON_DPAD_UP: btn = GAMEPAD_BUTTON_LEFT_FACE_UP; break;
+        case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT: btn = GAMEPAD_BUTTON_LEFT_FACE_RIGHT; break;
+        case GLFW_GAMEPAD_BUTTON_DPAD_DOWN: btn = GAMEPAD_BUTTON_LEFT_FACE_DOWN; break;
+        case GLFW_GAMEPAD_BUTTON_DPAD_LEFT: btn = GAMEPAD_BUTTON_LEFT_FACE_LEFT; break;
 
-        // case GLFW_GAMEPAD_BUTTON_DPAD_UP: btn = GAMEPAD_BUTTON_LEFT_FACE_UP; break;
-        // case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT: btn = GAMEPAD_BUTTON_LEFT_FACE_RIGHT; break;
-        // case GLFW_GAMEPAD_BUTTON_DPAD_DOWN: btn = GAMEPAD_BUTTON_LEFT_FACE_DOWN; break;
-        // case GLFW_GAMEPAD_BUTTON_DPAD_LEFT: btn = GAMEPAD_BUTTON_LEFT_FACE_LEFT; break;
-
-        // case GLFW_GAMEPAD_BUTTON_LEFT_THUMB: btn = GAMEPAD_BUTTON_LEFT_THUMB; break;
-        // case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB: btn = GAMEPAD_BUTTON_RIGHT_THUMB; break;
+        case GLFW_GAMEPAD_BUTTON_LEFT_THUMB: btn = GAMEPAD_BUTTON_LEFT_THUMB; break;
+        case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB: btn = GAMEPAD_BUTTON_RIGHT_THUMB; break;
     }
 #endif
 
@@ -3534,31 +3526,21 @@ static void PollInputEvents(void)
             // Get current gamepad state
             // NOTE: There is no callback available, so we get it manually
             // Get remapped buttons
-            // GLFWgamepadstate state;
-            // glfwGetGamepadState(i, &state); // This remapps all gamepads so they have their buttons mapped like an xbox controller
-            // const unsigned char *buttons = state.buttons;
+            GLFWgamepadstate state;
+            int result = glfwGetGamepadState(i, &state); // This remapps all gamepads so they have their buttons mapped like an xbox controller
 
-            int buttonsCount = 0;
-            const unsigned char *buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonsCount);
-
-            for (int k = 0; (buttons != NULL) && (k < MAX_GAMEPAD_BUTTONS) && (k < buttonsCount); k++)
+            if (!result)
             {
-                printf("b[%i]:%i ", k, (buttons[k] == GLFW_PRESS));
-
-                const GamepadButton button = GetGamepadButton(k);
-
-                if (buttons[k] == GLFW_PRESS)
-                {
-                    currentGamepadState[i][button] = 1;
-                    lastGamepadButtonPressed = button;
-                }
-                else currentGamepadState[i][button] = 0;
+                printf("Failed to get gamepad state\n");
             }
 
-            printf("\t");
+            // int buttonsCount = 0;
+            // const unsigned char *buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonsCount);
 
-            // for (int k = 0; (buttons != NULL) && (k < GLFW_GAMEPAD_BUTTON_DPAD_LEFT + 1) && (k < MAX_GAMEPAD_BUTTONS); k++)
+            // for (int k = 0; (buttons != NULL) && (k < MAX_GAMEPAD_BUTTONS) && (k < buttonsCount); k++)
             // {
+            //     printf("b[%i]:%i ", k, (buttons[k] == GLFW_PRESS));
+
             //     const GamepadButton button = GetGamepadButton(k);
 
             //     if (buttons[k] == GLFW_PRESS)
@@ -3568,29 +3550,49 @@ static void PollInputEvents(void)
             //     }
             //     else currentGamepadState[i][button] = 0;
             // }
+
+            // printf("\t");
+
+            const unsigned char *buttons = state.buttons;
+            int buttonsCount = 0;
+            glfwGetJoystickButtons(i, &buttonsCount);
+
+            for (int k = 0; (buttons != NULL) && (k < buttonsCount) && (k < MAX_GAMEPAD_BUTTONS); k++)
+            {
+                const GamepadButton button = GetGamepadButton(k);
+
+                if (buttons[k] == GLFW_PRESS)
+                {
+                    currentGamepadState[i][button] = 1;
+                    lastGamepadButtonPressed = button;
+                }
+                else currentGamepadState[i][button] = 0;
+            }
             
 
             // Get current axis state
-            int axesCount = 0;
-            const float *axes = glfwGetJoystickAxes(i, &axesCount);
+            // int axesCount = 0;
+            // const float *axes = glfwGetJoystickAxes(i, &axesCount);
 
-            for (int k = 0; (axes != NULL) && (k < MAX_GAMEPAD_AXIS) && (k < axesCount); k++)
-            {
-                printf("ax[%i]:%.3f ", k, axes[k]);
-                printf("\t");
-                const GamepadAxis axis = GetGamepadAxis(k);
-                gamepadAxisState[i][axis] = axes[k];
-            }
-
-            printf("\n");
-
-            // const float *axes = state.axes;
-
-            // for (int k = 0; (axes != NULL) && (k < GLFW_GAMEPAD_AXIS_LAST + 1) && (k < MAX_GAMEPAD_AXIS); k++)
+            // for (int k = 0; (axes != NULL) && (k < MAX_GAMEPAD_AXIS) && (k < axesCount); k++)
             // {
+            //     printf("ax[%i]:%.3f ", k, axes[k]);
+            //     printf("\t");
             //     const GamepadAxis axis = GetGamepadAxis(k);
             //     gamepadAxisState[i][axis] = axes[k];
             // }
+
+            // printf("\n");
+
+            const float *axes = state.axes;
+            int axesCount = 0;
+            glfwGetJoystickAxes(i, &axesCount);
+
+            for (int k = 0; (axes != NULL) && (k < axesCount) && (k < MAX_GAMEPAD_AXIS); k++)
+            {
+                const GamepadAxis axis = GetGamepadAxis(k);
+                gamepadAxisState[i][axis] = axes[k];
+            }
 
             // Register buttons for 2nd triggers (because GLFW doesn't count these as buttons but rather axis)
             currentGamepadState[i][GAMEPAD_BUTTON_LEFT_TRIGGER_2] = (char)(gamepadAxisState[i][GAMEPAD_AXIS_LEFT_TRIGGER] > 0.1);
