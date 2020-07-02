@@ -306,8 +306,8 @@ const (
 	GamepadRightFaceLEFT  = 8
 
 	GamepadButtonL1 = 9
-	GamepadButtonL2 = 11
-	GamepadButtonR1 = 10
+	GamepadButtonR1 = 11
+	GamepadButtonL2 = 10
 	GamepadButtonR2 = 12
 
 	GamepadMiddleLeft  = 13
