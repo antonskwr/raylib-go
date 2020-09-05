@@ -3216,11 +3216,10 @@ static bool InitGraphicsDevice(int width, int height)
 
 #if defined(PLATFORM_DESKTOP)
     glfwGetMonitorContentScale(monitor, &contentScaling.x, &contentScaling.y);
-    TraceLog(LOG_WARNING, "monitor scale %f", contentScaling.x);
+    TraceLog(LOG_INFO, "Monitor scale %f", contentScaling.x);
 
     if ((contentScaling.x == 2.0f) && (contentScaling.y == 2.0f))
     {
-        TraceLog(LOG_WARNING, "TRUEEEEE", contentScaling.x);
         SetTextureFilter(GetFontDefault().texture, FILTER_BILINEAR);
     }
 #endif  // PLATFORM_DESKTOP
