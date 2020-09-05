@@ -1998,7 +1998,7 @@ void ClearDirectoryFiles(void)
 
         RL_FREE(dirFilesPath);
     }
-    
+
     dirFilesCount = 0;
 }
 
@@ -2309,7 +2309,7 @@ int GetGamepadAxisCount(int gamepad)
     // printf("\n");
 
     // GLFWgamepadstate state;
- 
+
     // if (glfwGetGamepadState(GLFW_JOYSTICK_1, &state))
     // {
     //     if (state.buttons[GLFW_GAMEPAD_BUTTON_A])
@@ -3216,7 +3216,7 @@ static bool InitGraphicsDevice(int width, int height)
 
 #if defined(PLATFORM_DESKTOP)
     glfwGetMonitorContentScale(monitor, &contentScaling.x, &contentScaling.y);
-    TraceLog(LOG_INFO, "Monitor scale %f", contentScaling.x);
+    TraceLog(LOG_INFO, "Monitor scale %.2f", contentScaling.x);
 
     if ((contentScaling.x == 2.0f) && (contentScaling.y == 2.0f))
     {
@@ -3567,7 +3567,7 @@ static void PollInputEvents(void)
                 }
                 else currentGamepadState[i][button] = 0;
             }
-            
+
 
             // Get current axis state
             // int axesCount = 0;
@@ -3787,7 +3787,7 @@ static void CursorEnterCallback(GLFWwindow *window, int enter)
 // NOTE: Window resizing not allowed by default
 static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 {
-    SetupViewport(width, height);    // Reset viewport and projection matrix for new size 
+    SetupViewport(width, height);    // Reset viewport and projection matrix for new size
     // Set current screen size
     screenWidth = width;
     screenHeight = height;
@@ -3977,7 +3977,7 @@ static int32_t AndroidInputCallback(struct android_app *app, AInputEvent *event)
         if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN)
         {
             currentKeyState[keycode] = 1;  // Key down
-            
+
             keyPressedQueue[keyPressedQueueCount] = keycode;
             keyPressedQueueCount++;
         }
@@ -3994,7 +3994,7 @@ static int32_t AndroidInputCallback(struct android_app *app, AInputEvent *event)
         if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN)
         {
             currentKeyState[keycode] = 1;   // Key down
-            
+
             keyPressedQueue[keyPressedQueueCount] = keycode;
             keyPressedQueueCount++;
         }
@@ -4360,15 +4360,15 @@ static void ProcessKeyboard(void)
         }
         else if (keysBuffer[i] == 0x0a)     // raylib KEY_ENTER (don't mix with <linux/input.h> KEY_*)
         {
-            currentKeyState[257] = 1; 
-            
+            currentKeyState[257] = 1;
+
             keyPressedQueue[keyPressedQueueCount] = 257;     // Add keys pressed into queue
             keyPressedQueueCount++;
         }
         else if (keysBuffer[i] == 0x7f)     // raylib KEY_BACKSPACE
-        { 
-            currentKeyState[259] = 1; 
-            
+        {
+            currentKeyState[259] = 1;
+
             keyPressedQueue[keyPressedQueueCount] = 257;     // Add keys pressed into queue
             keyPressedQueueCount++;
         }
@@ -4797,7 +4797,7 @@ static void *EventThread(void *arg)
                         */
 
                         currentKeyState[keycode] = event.value;
-                        if (event.value == 1) 
+                        if (event.value == 1)
                         {
                             keyPressedQueue[keyPressedQueueCount] = keycode;     // Register last key pressed
                             keyPressedQueueCount++;
